@@ -21,6 +21,9 @@ class Location(models.Model):
 class Size(models.Model):
     size = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.size
+
 
 class PriceRate(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
@@ -30,6 +33,9 @@ class PriceRate(models.Model):
 
     class Meta:
         unique_together = ['location', 'initial_rate', 'rate_per_hour', 'size']
+
+    def __str__(self):
+        return f'{self.initial_rate} + {self.rate_per_hour}/hour in {self.location}, size: {self.size}'
 
 
 class ParkingSpace(models.Model):
@@ -41,6 +47,9 @@ class ParkingSpace(models.Model):
 
     class Meta:
         unique_together = ['location', 'story', 'space_number']
+
+    def __str__(self):
+        return f'{self.location} - {self.story}:{self.space_number}'
 
 
 RESERVATION_STATUS = (
@@ -62,8 +71,6 @@ class Reservation(models.Model):
     check_out = models.DateTimeField()
     status = models.CharField(max_length=1, choices=RESERVATION_STATUS)
 
-# Payment:
-
 
 class Payment(models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
@@ -77,6 +84,9 @@ class Receipt(models.Model):
     receipt_reference = models.CharField(max_length=300, unique=True)
     payment = models.OneToOneField(Payment, on_delete=models.CASCADE)
     email_sent = models.BooleanField()
+
+    def __str__(self):
+        return self.receipt_reference
 
     def save(self, *args, **kwargs):
         if not self.receipt_reference:
