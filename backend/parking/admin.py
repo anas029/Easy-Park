@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import (Location, ParkingSpace, Payment, PriceRate, Receipt,
+                     Reservation, Size)
+
+admin.site.register([Location, ParkingSpace, Payment,
+                    PriceRate, Receipt, Reservation, Size])
