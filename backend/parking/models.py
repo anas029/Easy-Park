@@ -45,6 +45,10 @@ class ParkingSpace(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     price_rate = models.ForeignKey(PriceRate, on_delete=models.DO_NOTHING)
 
+    @property
+    def size(self):
+        return self.price_rate.size if self.price_rate else None
+
     class Meta:
         unique_together = ['location', 'story', 'space_number']
 

@@ -1,5 +1,7 @@
 from rest_framework.generics import (ListCreateAPIView,
-                                     RetrieveUpdateDestroyAPIView)
+                                     RetrieveUpdateDestroyAPIView,
+                                     RetrieveAPIView,
+                                     ListAPIView)
 from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
@@ -15,101 +17,91 @@ from .serializers import (LocationSerializer, ParkingSpaceSerializer,
 
 
 class SizeListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = SizeSerializer
     queryset = Size.objects.all()
 
 
 class SizeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = SizeSerializer
     queryset = Size.objects.all()
 
 
 class LocationListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUserOrReadOnly]
+    # permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
 
 
 class LocationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUserOrReadOnly]
+    # permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
 
 
 class ParkingSpaceListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = ParkingSpaceSerializer
-    # queryset = ParkingSpace.objects.select_related(
-    #     'price_rate__size', 'location')
-
-    # # Using select_related to fetch the related models in a single query
-    # queryset = ParkingSpace.objects.select_related('location', 'price_rate')
-
-    # # Using prefetch_related for reverse foreign key relationships
-    # queryset = PriceRate.objects.prefetch_related(
-    #     'location_set', 'location_set')
-    def get_queryset(self):
-        # Using select_related to fetch the related models in a single query
-        queryset = ParkingSpace.objects.select_related(
-            'location', 'price_rate')
-
-        # Using prefetch_related for reverse foreign key relationships
-        queryset = queryset.prefetch_related('price_rate__location_set')
-
-        return queryset
+    queryset = ParkingSpace.objects.select_related(
+        'price_rate__size', 'location', 'price_rate__location')
 
 
-class ParkingSpaceRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+class ParkingSpaceRetrieveUpdateDestroyAPIView(RetrieveAPIView):
+    # permission_classes = [IsAdminUser]
     serializer_class = ParkingSpaceSerializer
-    queryset = ParkingSpace.objects.all()
+    queryset = ParkingSpace.objects.select_related(
+        'price_rate__size', 'location', 'price_rate__location')
 
 
 class PaymentListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
 
 
 class PaymentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
 
 
 class PriceRateListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = PriceRateSerializer
-    queryset = PriceRate.objects.all()
+    queryset = PriceRate.objects.select_related(
+        'size', 'location')
 
 
 class PriceRateRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = PriceRateSerializer
-    queryset = PriceRate.objects.all()
+    queryset = PriceRate.objects.select_related(
+        'size', 'location')
 
 
 class ReceiptListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = ReceiptSerializer
     queryset = Receipt.objects.all()
 
 
 class ReceiptRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = ReceiptSerializer
     queryset = Receipt.objects.all()
 
 
-class ReservationListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+class ReservationListCreateView(ListAPIView):
+    # permission_classes = [IsAdminUser]
     serializer_class = ReservationSerializer
     queryset = Reservation.objects.all()
+    # queryset = Reservation.objects.select_related('user', 'parking_space').prefetch_related(
+    #     'receipt_set', 'payment_set')
+    # queryset = queryset.prefetch_related('childmodel_set')
 
 
-class ReservationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+class ReservationRetrieveUpdateDestroyAPIView(RetrieveAPIView):
+    # permission_classes = [IsAdminUser]
     serializer_class = ReservationSerializer
     queryset = Reservation.objects.all()

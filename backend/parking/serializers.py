@@ -16,12 +16,6 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ParkingSpaceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ParkingSpace
-        fields = '__all__'
-
-
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -40,6 +34,22 @@ class PriceRateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PriceRate
+        fields = '__all__'
+
+
+class ParkingSpaceSerializer(serializers.ModelSerializer):
+    size = serializers.CharField(read_only=True)
+    location = LocationSerializer(read_only=True)
+    price_rate = PriceRateSerializer(read_only=True)
+    location_id = serializers.PrimaryKeyRelatedField(
+        queryset=Location.objects.all(), write_only=True, source='location'
+    )
+    price_rate_id = serializers.PrimaryKeyRelatedField(
+        queryset=PriceRate.objects.all(), write_only=True, source='price_rate'
+    )
+
+    class Meta:
+        model = ParkingSpace
         fields = '__all__'
 
 
