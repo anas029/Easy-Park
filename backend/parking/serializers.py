@@ -43,18 +43,24 @@ class ParkingSpaceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     size = serializers.CharField(read_only=True)
-    location = LocationSerializer(read_only=True)
+    location = serializers.CharField(read_only=True)
     price_rate = PriceRateSerializer(read_only=True)
     price_rate_id = serializers.PrimaryKeyRelatedField(
         queryset=PriceRate.objects.all(), write_only=True, source='price_rate'
     )
 
     def validate(self, data):
-        data['location_id'] = data['price_rate'].location.id
+        data['location_id'] = data['price_rate'].location.id if data.get(
+            'price_rate') else self.instance.location.id if self.instance else None
+        story = data.get(
+            'story', self.instance.story if self.instance else None)
+        space_number = data.get(
+            'space_number', self.instance.space_number if self.instance else None)
+
         existing_spaces = ParkingSpace.objects.filter(
             location=data['location_id'],
-            story=data['story'],
-            space_number=data['space_number']
+            story=story,
+            space_number=space_number
         )
         if self.instance:
             existing_spaces = existing_spaces.exclude(
@@ -75,3 +81,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = '__all__'
+
+    def validate(self, data):
+        data['user'] = self['context'].user.id
+        return data
