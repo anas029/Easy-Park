@@ -16,12 +16,6 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ParkingSpaceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ParkingSpace
-        fields = '__all__'
-
-
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -41,6 +35,34 @@ class PriceRateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PriceRate
         fields = '__all__'
+
+
+class ParkingSpaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ParkingSpace
+        fields = '__all__'
+
+    size = serializers.CharField(read_only=True)
+    location = LocationSerializer(read_only=True)
+    price_rate = PriceRateSerializer(read_only=True)
+    price_rate_id = serializers.PrimaryKeyRelatedField(
+        queryset=PriceRate.objects.all(), write_only=True, source='price_rate'
+    )
+
+    def validate(self, data):
+        data['location_id'] = data['price_rate'].location.id
+        existing_spaces = ParkingSpace.objects.filter(
+            location=data['location_id'],
+            story=data['story'],
+            space_number=data['space_number']
+        )
+        if self.instance:
+            existing_spaces = existing_spaces.exclude(
+                pk=self.instance.pk)  # Exclude current instance if updating
+        if existing_spaces.exists():
+            raise serializers.ValidationError(
+                "A parking space with the same location, story, and space number already exists.")
+        return data
 
 
 class ReceiptSerializer(serializers.ModelSerializer):

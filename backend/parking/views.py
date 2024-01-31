@@ -1,5 +1,10 @@
+from rest_framework import status
+from django.db import IntegrityError
+from rest_framework.response import Response
 from rest_framework.generics import (ListCreateAPIView,
-                                     RetrieveUpdateDestroyAPIView)
+                                     RetrieveUpdateDestroyAPIView,
+                                     RetrieveAPIView,
+                                     ListAPIView)
 from rest_framework.permissions import (IsAdminUser, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
@@ -27,13 +32,13 @@ class SizeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 
 class LocationListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUserOrReadOnly]
+    # permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
 
 
 class LocationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUserOrReadOnly]
+    # permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
 
@@ -41,36 +46,23 @@ class LocationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 class ParkingSpaceListCreateView(ListCreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = ParkingSpaceSerializer
-    # queryset = ParkingSpace.objects.select_related(
-    #     'price_rate__size', 'location')
-
-    # # Using select_related to fetch the related models in a single query
-    # queryset = ParkingSpace.objects.select_related('location', 'price_rate')
-
-    # # Using prefetch_related for reverse foreign key relationships
-    # queryset = PriceRate.objects.prefetch_related(
-    #     'location_set', 'location_set')
-    def get_queryset(self):
-        # Using select_related to fetch the related models in a single query
-        queryset = ParkingSpace.objects.select_related(
-            'location', 'price_rate')
-
-        # Using prefetch_related for reverse foreign key relationships
-        queryset = queryset.prefetch_related('price_rate__location_set')
-
-        return queryset
+    queryset = ParkingSpace.objects.select_related(
+        'price_rate__size', 'location', 'price_rate__location')
 
 
 class ParkingSpaceRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = ParkingSpaceSerializer
-    queryset = ParkingSpace.objects.all()
+    queryset = ParkingSpace.objects.select_related(
+        'price_rate__size', 'location', 'price_rate__location')
 
 
 class PaymentListCreateView(ListCreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
-    queryset = Payment.objects.all()
+    # queryset = Payment.objects.all()
+    queryset = Payment.objects.select_related(
+        'reservation')
 
 
 class PaymentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
@@ -82,13 +74,15 @@ class PaymentRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 class PriceRateListCreateView(ListCreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = PriceRateSerializer
-    queryset = PriceRate.objects.all()
+    queryset = PriceRate.objects.select_related(
+        'size', 'location')
 
 
 class PriceRateRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = PriceRateSerializer
-    queryset = PriceRate.objects.all()
+    queryset = PriceRate.objects.select_related(
+        'size', 'location')
 
 
 class ReceiptListCreateView(ListCreateAPIView):
@@ -107,6 +101,9 @@ class ReservationListCreateView(ListCreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = ReservationSerializer
     queryset = Reservation.objects.all()
+    # queryset = Reservation.objects.select_related('user', 'parking_space').prefetch_related(
+    #     'receipt_set', 'payment_set')
+    # queryset = queryset.prefetch_related('childmodel_set')
 
 
 class ReservationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):

@@ -13,4 +13,16 @@ urlpatterns = [
     path('pricerate/', views.PriceRateListCreateView.as_view()),
     path('pricerate/<int:pk>',
          views.PriceRateRetrieveUpdateDestroyAPIView.as_view()),
+
+    path('receipts/', views.ReceiptListCreateView.as_view()),
+    path('receipts/<int:pk>',
+         views.ReceiptRetrieveUpdateDestroyAPIView.as_view()),
+
+    path('reservations/', views.ReservationListCreateView.as_view()),
+    path('reservations/<int:pk>',
+         views.ReservationRetrieveUpdateDestroyAPIView.as_view()),
+
+    path('payments/', views.PaymentListCreateView.as_view()),
+    path('payments/<int:pk>',
+         views.PaymentRetrieveUpdateDestroyAPIView.as_view()),
 ]
