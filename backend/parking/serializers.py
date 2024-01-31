@@ -82,6 +82,9 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = '__all__'
 
+    user = serializers.CharField(read_only=True)
+    end_datetime = serializers.CharField(read_only=True)
+
     def validate(self, data):
-        data['user'] = self['context'].user.id
+        data['user'] = self.context['request'].user
         return data
