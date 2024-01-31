@@ -32,26 +32,26 @@ class SizeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 
 class LocationListCreateView(ListCreateAPIView):
-    # permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
 
 
 class LocationRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    # permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
 
 
 class ParkingSpaceListCreateView(ListCreateAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = ParkingSpaceSerializer
     queryset = ParkingSpace.objects.select_related(
         'price_rate__size', 'location', 'price_rate__location')
 
 
 class ParkingSpaceRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUserOrReadOnly]
     serializer_class = ParkingSpaceSerializer
     queryset = ParkingSpace.objects.select_related(
         'price_rate__size', 'location', 'price_rate__location')

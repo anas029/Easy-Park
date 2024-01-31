@@ -1,3 +1,4 @@
+from datetime import timedelta
 import random
 import string
 
@@ -53,7 +54,7 @@ class ParkingSpace(models.Model):
         unique_together = ['location', 'story', 'space_number']
 
     def __str__(self):
-        return f'{self.location} - {self.story}:{self.space_number}'
+        return f'Parking Space {self.id} - {self.location} - {self.story}:{self.space_number}'
 
 
 RESERVATION_STATUS = (
@@ -70,10 +71,20 @@ RESERVATION_STATUS = (
 class Reservation(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     parking_space = models.ForeignKey(ParkingSpace, on_delete=models.CASCADE)
-    reservation = models.DateTimeField()
+    start_datetime = models.DateTimeField()
+    duration_hours = models.PositiveIntegerField()
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
     status = models.CharField(max_length=1, choices=RESERVATION_STATUS)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def end_datetime(self):
+        return self.start_datetime + timedelta(hours=self.duration_hours)
+
+    def __str__(self):
+        return f"Reservation {self.id} - User: {self.user.username}, Start: {self.start_datetime}, End: {self.end_datetime()}"
 
 
 class Payment(models.Model):
