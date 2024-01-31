@@ -149,7 +149,8 @@ AUTH_USER_MODEL = 'users.UserAccount'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'users.authentication.CustomTokenAuthentication'
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'parking.pagination.Pagination',
 }
 
 
